@@ -10,7 +10,7 @@ import SwiftData
 
 @main
 struct globe_json_parserApp: App {
-    var sharedModelContainer: ModelContainer = {
+    var modelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
         ])
@@ -25,8 +25,8 @@ struct globe_json_parserApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(modelContext: modelContainer.mainContext)
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(modelContainer)
     }
 }

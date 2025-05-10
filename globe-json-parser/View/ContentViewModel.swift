@@ -7,47 +7,71 @@
 
 import SwiftUI
 import SwiftData
+import Alamofire
 
 extension ContentView {
     @Observable
     class ContentViewModel {
         var modelContext: ModelContext
-        var items = [Item]()
+        var isDownloading = false
+        var posts = [PostItem]()
 
         init(modelContext: ModelContext) {
             self.modelContext = modelContext
-            fetchData()
         }
 
         // MARK: - Public Methods
-        func addItem() {
-            withAnimation {
-                let newItem = Item(timestamp: Date())
-                modelContext.insert(newItem)
-                fetchData()
-            }
-        }
-
         func deleteItems(offsets: IndexSet) {
             withAnimation {
                 for index in offsets {
-                    modelContext.delete(items[index])
+                    modelContext.delete(posts[index])
                 }
-                fetchData()
+                do {
+                    try modelContext.save()
+                } catch {
+                    print(error.localizedDescription)
+                }
+                fetchPosts()
             }
         }
 
-        func fetchData() {
+        func fetchPosts() {
             do {
-                let descriptor = FetchDescriptor<Item>(sortBy: [SortDescriptor(\.timestamp)])
-                items = try modelContext.fetch(descriptor)
+                let descriptor = FetchDescriptor<PostItem>(sortBy: [SortDescriptor(\.title)])
+                posts = try modelContext.fetch(descriptor)
             } catch {
                 print("Fetch failed")
             }
         }
+    }
+}
 
-        func fetchDataFromAPI() async {
+extension ContentView.ContentViewModel {
+    func downloadPosts() {
+        isDownloading = true
+        Task { @MainActor in
+            let items = await GetPostsFromAPIUseCase().invoke()
+            insertItems(items)
+            isDownloading = false
+        }
+    }
 
+    private func insertItems(_ items: [PostItem]) {
+        let container = modelContext.container
+
+        Task.detached {
+            let handler = DataHandler(modelContainer: container)
+            await withTaskGroup { group in
+                for item in items {
+                    group.addTask {
+                        await handler.insertItem(item)
+                    }
+                }
+            }
+            Task { @MainActor in
+                self.fetchPosts()
+            }
         }
     }
 }
+

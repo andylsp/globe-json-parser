@@ -16,14 +16,48 @@ struct ContentView: View {
         _viewModel = State(initialValue: viewModel)
     }
 
+    // MARK: - View Body
     var body: some View {
+        content
+            .onAppear {
+                guard !viewModel.isDownloading else { return }
+                viewModel.fetchPosts()
+            }
+    }
+}
+
+// MARK: - View Content
+extension ContentView {
+    @ViewBuilder
+    private var content: some View {
+        if viewModel.posts.isEmpty || viewModel.isDownloading {
+            if viewModel.isDownloading {
+                ProgressView()
+                    .progressViewStyle(.automatic)
+            } else {
+                downloadButton
+            }
+        } else {
+            listView
+        }
+    }
+
+    @ViewBuilder
+    private var downloadButton: some View {
+        Button(action: viewModel.downloadPosts) {
+            Label("Download Posts", systemImage: "arrow.down.circle")
+        }
+    }
+
+    @ViewBuilder
+    private var listView: some View {
         NavigationStack {
             List {
-                ForEach(viewModel.items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                ForEach(viewModel.posts) { item in
+                    VStack(alignment: .leading) {
+                        Text(item.title)
+                            .font(.headline)
+                            .lineLimit(1)
                     }
                 }
                 .onDelete(perform: viewModel.deleteItems)
@@ -31,11 +65,6 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
-                }
-                ToolbarItem {
-                    Button(action: viewModel.addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
                 }
             }
         }

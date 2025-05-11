@@ -13,7 +13,7 @@ struct globe_json_parserApp: App {
     var modelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
-            PostItem.self
+            Item.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

@@ -1,5 +1,5 @@
 //
-//  GetPostsFromAPIUseCase.swift
+//  GetItemsFromAPIUseCase.swift
 //  globe-json-parser
 //
 //  Created by Jonathan Andy Lim on 5/10/25.
@@ -8,15 +8,15 @@
 import Foundation
 import Alamofire
 
-protocol GetPostsFromAPIUseCaseProtocol {
-    func invoke() async -> [PostItem]
+protocol GetItemsFromAPIUseCaseProtocol {
+    func invoke() async -> [Item]
 }
 
-struct GetPostsFromAPIUseCase: GetPostsFromAPIUseCaseProtocol {
+struct GetItemsFromAPIUseCase: GetItemsFromAPIUseCaseProtocol {
     private let apiManager = APIManager.shared
 
-    func invoke() async -> [PostItem] {
-        let response: DataResponse<[PostItem], AFError> = await apiManager.get(url: "https://jsonplaceholder.typicode.com/posts")
+    func invoke() async -> [Item] {
+        let response: DataResponse<[Item], AFError> = await apiManager.get(url: "https://jsonplaceholder.typicode.com/posts")
         switch response.result {
         case .success(let value):
             return value

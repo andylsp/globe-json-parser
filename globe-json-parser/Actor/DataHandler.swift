@@ -10,7 +10,7 @@ import SwiftData
 
 @ModelActor
 actor DataHandler {
-    func insertItem(_ item: PostItem) {
+    func insertItem(_ item: Item) {
         modelContext.insert(item)
         do {
             try modelContext.save()

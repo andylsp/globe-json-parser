@@ -21,7 +21,7 @@ struct ContentView: View {
         content
             .onAppear {
                 guard !viewModel.isDownloading else { return }
-                viewModel.fetchPosts()
+                viewModel.fetchData()
             }
     }
 }
@@ -30,7 +30,7 @@ struct ContentView: View {
 extension ContentView {
     @ViewBuilder
     private var content: some View {
-        if viewModel.posts.isEmpty || viewModel.isDownloading {
+        if viewModel.items.isEmpty || viewModel.isDownloading {
             if viewModel.isDownloading {
                 ProgressView()
                     .progressViewStyle(.automatic)
@@ -44,8 +44,8 @@ extension ContentView {
 
     @ViewBuilder
     private var downloadButton: some View {
-        Button(action: viewModel.downloadPosts) {
-            Label("Download Posts", systemImage: "arrow.down.circle")
+        Button(action: viewModel.downloadItems) {
+            Label("Download Items", systemImage: "arrow.down.circle")
         }
     }
 
@@ -53,7 +53,7 @@ extension ContentView {
     private var listView: some View {
         NavigationStack {
             List {
-                ForEach(viewModel.posts) { item in
+                ForEach(viewModel.items) { item in
                     VStack(alignment: .leading) {
                         Text(item.title)
                             .font(.headline)

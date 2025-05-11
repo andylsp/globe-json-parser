@@ -14,7 +14,7 @@ extension ContentView {
     class ContentViewModel {
         var modelContext: ModelContext
         var isDownloading = false
-        var posts = [PostItem]()
+        var items = [Item]()
 
         init(modelContext: ModelContext) {
             self.modelContext = modelContext
@@ -24,21 +24,21 @@ extension ContentView {
         func deleteItems(offsets: IndexSet) {
             withAnimation {
                 for index in offsets {
-                    modelContext.delete(posts[index])
+                    modelContext.delete(items[index])
                 }
                 do {
                     try modelContext.save()
                 } catch {
                     print(error.localizedDescription)
                 }
-                fetchPosts()
+                fetchData()
             }
         }
 
-        func fetchPosts() {
+        func fetchData() {
             do {
-                let descriptor = FetchDescriptor<PostItem>(sortBy: [SortDescriptor(\.title)])
-                posts = try modelContext.fetch(descriptor)
+                let descriptor = FetchDescriptor<Item>(sortBy: [SortDescriptor(\.title)])
+                items = try modelContext.fetch(descriptor)
             } catch {
                 print("Fetch failed")
             }
@@ -47,16 +47,16 @@ extension ContentView {
 }
 
 extension ContentView.ContentViewModel {
-    func downloadPosts() {
+    func downloadItems() {
         isDownloading = true
         Task { @MainActor in
-            let items = await GetPostsFromAPIUseCase().invoke()
+            let items = await GetItemsFromAPIUseCase().invoke()
             insertItems(items)
             isDownloading = false
         }
     }
 
-    private func insertItems(_ items: [PostItem]) {
+    private func insertItems(_ items: [Item]) {
         let container = modelContext.container
 
         Task.detached {
@@ -69,7 +69,7 @@ extension ContentView.ContentViewModel {
                 }
             }
             Task { @MainActor in
-                self.fetchPosts()
+                self.fetchData()
             }
         }
     }

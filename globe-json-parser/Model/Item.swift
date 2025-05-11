@@ -22,6 +22,13 @@ final class Item: Codable, Identifiable, Sendable {
         case body
     }
 
+    init(id: Int = 0, userId: Int = 0, title: String = "", body: String = "") {
+        self.id = id
+        self.userId = userId
+        self.title = title
+        self.body = body
+    }
+
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)

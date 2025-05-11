@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @EnvironmentObject private var navigationModel: NavigationModel
     @State private var viewModel: ContentViewModel
 
     init(modelContext: ModelContext) {
@@ -51,22 +52,37 @@ extension ContentView {
 
     @ViewBuilder
     private var listView: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationModel.path) {
             List {
                 ForEach(viewModel.items) { item in
-                    VStack(alignment: .leading) {
-                        Text(item.title)
-                            .font(.headline)
-                            .lineLimit(1)
-                    }
+                    listRowView(item: item)
+                        .onTapGesture {
+                            navigationModel.navigateTo(item)
+                        }
                 }
                 .onDelete(perform: viewModel.deleteItems)
             }
+            .listStyle(.plain)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
             }
+            .navigationDestination(for: Item.self) { item in
+                ContentDetailView(item: item)
+            }
+            .navigationTitle(Text("Items"))
+        }
+        .navigationBarTitleDisplayMode(.inline)
+
+    }
+
+    @ViewBuilder
+    private func listRowView(item: Item) -> some View {
+        VStack(alignment: .leading) {
+            Text(item.title)
+                .font(.headline)
+                .lineLimit(1)
         }
     }
 }

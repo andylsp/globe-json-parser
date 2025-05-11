@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct globe_json_parserApp: App {
+    @StateObject var navigationModel = NavigationModel()
+
     var modelContainer: ModelContainer = {
         let schema = Schema([
             Item.self
@@ -26,6 +28,7 @@ struct globe_json_parserApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(modelContext: modelContainer.mainContext)
+                .environmentObject(navigationModel)
         }
         .modelContainer(modelContainer)
     }

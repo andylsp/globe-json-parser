@@ -1,14 +1,14 @@
 //
-//  globe_json_parserTests.swift
+//  UseCaseTests.swift
 //  globe-json-parserTests
 //
-//  Created by Jonathan Andy Lim on 5/9/25.
+//  Created by Jonathan Andy Lim on 5/11/25.
 //
 
 import XCTest
 @testable import globe_json_parser
 
-final class globe_json_parserTests: XCTestCase {
+final class UseCaseTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

@@ -48,8 +48,8 @@ extension ContentView {
 
 extension ContentView.ContentViewModel {
     func downloadItems() {
-        isDownloading = true
         Task { @MainActor in
+            isDownloading = true
             let items = await GetItemsFromAPIUseCase().invoke()
             insertItems(items)
             isDownloading = false
